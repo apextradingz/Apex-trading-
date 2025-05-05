@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Apex Trading Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0d1b2a;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    header, footer {
+      background: #1b263b;
+      padding: 1em;
+      text-align: center;
+    }
+    main {
+      padding: 2em;
+    }
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1em;
+      margin-top: 2em;
+    }
+    .card {
+      background: #415a77;
+      padding: 1em;
+      border-radius: 8px;
+    }
+    input, button {
+      padding: 0.5em;
+      margin-top: 1em;
+      width: 100%;
+    }
+    .login-section {
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Apex Trading</h1>
+    <p>Endorsed by Trump – Maximize Profit, Minimize Loss</p>
+  </header>
+
+  <main>
+    <section class="login-section">
+      <h2>Login</h2>
+      <input type="text" id="username" placeholder="Enter your username">
+      <button onclick="login()">Login</button>
+    </section>
+
+    <section id="dashboard" style="display: none;">
+      <h2>Dashboard</h2>
+      <div class="dashboard">
+        <div class="card"><strong>Deposit:</strong> $<span id="deposit">0</span></div>
+        <div class="card"><strong>BTC Balance:</strong> <span id="btc">0.00</span> BTC</div>
+        <div class="card"><strong>Earnings:</strong> $<span id="earnings">0</span></div>
+        <div class="card"><strong>Recent Trades:</strong> <ul id="trades"></ul></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Admin: Adjust earnings using <code>?user=username&earnings=VALUE</code></p>
+  </footer>
+
+  <script>
+    // Simulated backend data
+    const fakeDB = {
+      john: {
+        deposit: 500,
+        btc: 0.025,
+        earnings: 120,
+        trades: ["Buy 0.01 BTC", "Buy 0.015 BTC"]
+      },
+      alice: {
+        deposit: 800,
+        btc: 0.05,
+        earnings: 300,
+        trades: ["Buy 0.03 BTC", "Buy 0.02 BTC"]
+      }
+    };
+
+    function login() {
+      const user = document.getElementById('username').value.toLowerCase();
+      const data = fakeDB[user];
+      if (!data) {
+        alert("User not found.");
+        return;
+      }
+      localStorage.setItem("currentUser", user);
+      displayDashboard(user);
+    }
+
+    function displayDashboard(user) {
+      const data = fakeDB[user];
+      document.getElementById('dashboard').style.display = 'block';
+      document.getElementById('deposit').textContent = data.deposit;
+      document.getElementById('btc').textContent = data.btc;
+      document.getElementById('earnings').textContent = data.earnings;
+      document.getElementById('trades').innerHTML = data.trades.map(t => `<li>${t}</li>`).join('');
+    }
+
+    // Admin URL-like control
+    window.onload = function() {
+      const params = new URLSearchParams(window.location.search);
+      const user = params.get('user');
+      const earnings = params.get('earnings');
+      if (user && earnings && fakeDB[user]) {
+        fakeDB[user].earnings = parseFloat(earnings);
+        alert(`Earnings for ${user} set to $${earnings}`);
+        if (localStorage.getItem("currentUser") === user) {
+          displayDashboard(user);
+        }
+      }
+    };
+  </script>
+</body>
+</html>
